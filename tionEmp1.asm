@@ -48,7 +48,7 @@ main:
 
 summation_x:
 	beq s0, s11, summation_x_end
-	lw s6, (t1)			# (t4) x_vals
+	lw s6, (t1)			# s6 <-- x_vals
 
 	addi s0, s0, 1		# Increment counter
 	add s1, s1, s6		# Add x_vals to summation
@@ -72,7 +72,7 @@ summation_x_end:
 	addi s1, x0, 0		# (s1) Summation of y_vals
 summation_y:
 	beq, s0, s11, summation_y_end
-	lw s6, (t2)			# (t6) y_vals
+	lw s6, (t2)			# s6 <-- y_vals
 
 	addi s0, s0, 1 		# Increment counter
 	add s1, s1, s6		# Add y_vals to summation
@@ -85,5 +85,30 @@ summation_y_end:
 
 	print_int(s1)		# Prints summation of y_vals
 
+	# Reset counters
+	la t1, x_vals		# (t1) Pointer to x_vals
+	la t2, y_vals		# (t2) Pointer to y_vals
+
+
+	addi s0, x0, 0		# (s0) Counter
+	addi s1, x0, 0		# (s1) Summation of square of x_vals
+
+
+sum_x_square:
+	beq, s0, s11, sum_x_square_end
+	lw s6, (t1)			# s6 <-- x_vals
+	
+	addi s0, s0, 1 		# Increment counter
+	mul s6, s6, s6		# Square
+	add s1, s1, s6		# Add val to summation
+	addi t1, t1, 4		# Increment pointer to x_vals
+	j sum_x_square
+			
+sum_x_square_end:
+
+	la t4, x_sum_squared
+	sw s1, (t4)
+
+	print_int(s1)		# Prints summation of x_vals
 
 	bye
