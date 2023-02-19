@@ -5,6 +5,12 @@
 	ecall
 .end_macro
 
+.macro print_int(%x)
+	li a7, 1
+	mv a0, %x
+	ecall
+.end_macro
+
 .data
 x_vals: .word 1, 2, 3, 4, 5
 y_vals: .word 10, 15, 30, 40, 50
@@ -37,6 +43,7 @@ summation_x:
 
 
 summation_x_end:
+	print_int(s1)		# Prints summation of x_vals
 
 	# Grabs the summation of y_vals using n_elements as the limit
 	# and stores it in t7
@@ -56,7 +63,7 @@ summation_y:
 	j summation_y
 
 summation_y_end:
-
+	print_int(s2)		# Prints summation of y_vals
 
 
 	bye
