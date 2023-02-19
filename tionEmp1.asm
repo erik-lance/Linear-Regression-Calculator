@@ -38,6 +38,24 @@ summation_x:
 
 summation_x_end:
 
+	# Grabs the summation of y_vals using n_elements as the limit
+	# and stores it in t7
+	# t2 - Pointer to y_vals
+	# t3 - Pointer to n_elements
+	# t7 - Summation of y_vals
+
+	addi s0, x0, 0		# (s0) Counter
+	addi s2, x0, 0		# (s2) Summation of y_vals
+summation_y:
+	beq, s0, t3, summation_y_end
+	lw t5, (t2)			# (t5) y_vals
+
+	addi s0, s0, 1 		# Increment counter
+	add s2, s2, t5		# Add y_vals to summation
+	addi t2, t2, 4		# Increment pointer to y_vals
+	j summation_y
+
+summation_y_end:
 
 
 
