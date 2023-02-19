@@ -11,7 +11,11 @@
 	ecall
 .end_macro
 
-.macro print_int(%x)
+.macro print_int(%w, %x)
+	li a7, 4
+	la a0, %w
+	ecall
+
 	li a7, 1
 	mv a0, %x
 	ecall
@@ -22,6 +26,14 @@
 x_vals: .word 1, 2, 3, 4, 5
 y_vals: .word 10, 15, 30, 40, 50
 n_elements: .word 5
+
+print_x_sum: .asciz "x_sum:"
+print_y_sum: .asciz "y_sum:"
+print_x_sum2: .asciz "x_sum_2:"
+print_y_sum2: .asciz "y_sum_2:"
+print_xy_sum: .asciz "xy_sum:"
+print_m: .asciz "m:"
+print_b: .asciz "b:"
 
 x_sum: .word 0
 y_sum: .word 0
@@ -60,7 +72,7 @@ summation_x_end:
 	la t4, x_sum
 	sw s1, (t4)
 
-	print_int(s1)		# Prints summation of x_vals
+	print_int(print_x_sum, s1)		# Prints summation of x_vals
 
 	# Grabs the summation of y_vals using n_elements as the limit
 	# and stores it in t7
@@ -83,7 +95,7 @@ summation_y_end:
 	la t4, y_sum
 	sw s1, (t4)
 
-	print_int(s1)		# Prints summation of y_vals
+	print_int(print_y_sum, s1)		# Prints summation of y_vals
 
 	# Reset counters
 	la t1, x_vals		# (t1) Pointer to x_vals
@@ -110,7 +122,7 @@ sum_x_square_end:
 	la t4, x_sum_squared
 	sw s1, (t4)
 
-	print_int(s1)		# Prints summation of x_vals
+	print_int(print_x_sum2, s1)		# Prints summation of x_vals
 
 	addi s0, x0, 0		# (s0) Counter
 	addi s1, x0, 0		# (s1) Summation of square of y_vals
@@ -130,7 +142,7 @@ sum_y_square_end:
 	la t4, y_sum_squared
 	sw s1, (t4)
 
-	print_int(s1)		# Prints summation of y_vals
+	print_int(print_y_sum2, s1)		# Prints summation of y_vals
 
 
 	bye
