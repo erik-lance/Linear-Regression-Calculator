@@ -93,6 +93,7 @@ summation_y_end:
 	addi s0, x0, 0		# (s0) Counter
 	addi s1, x0, 0		# (s1) Summation of square of x_vals
 
+	# ------- Summation of Squares ------- #
 
 sum_x_square:
 	beq, s0, s11, sum_x_square_end
@@ -110,5 +111,26 @@ sum_x_square_end:
 	sw s1, (t4)
 
 	print_int(s1)		# Prints summation of x_vals
+
+	addi s0, x0, 0		# (s0) Counter
+	addi s1, x0, 0		# (s1) Summation of square of y_vals
+
+sum_y_square:
+	beq, s0, s11, sum_y_square_end
+	lw s6, (t2)			# s6 <-- y_vals
+	
+	addi s0, s0, 1 		# Increment counter
+	mul s6, s6, s6		# Square
+	add s1, s1, s6		# Add val to summation
+	addi t2, t2, 4		# Increment pointer to y_vals
+	j sum_y_square
+			
+sum_y_square_end:
+
+	la t4, y_sum_squared
+	sw s1, (t4)
+
+	print_int(s1)		# Prints summation of y_vals
+
 
 	bye
