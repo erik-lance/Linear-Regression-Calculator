@@ -12,6 +12,10 @@ n_elements: .word 5
 
 .text
 main:
+	la t1, x_vals		# (t1) Pointer to x_vals
+	la t2, y_vals		# (t2) Pointer to y_vals
+	la t3, n_elements	# (t3) Pointer to n_elements
+
 
 
 
