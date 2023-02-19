@@ -17,6 +17,28 @@ main:
 	la t3, n_elements	# (t3) Pointer to n_elements
 
 
+	# Grabs the summation of x_vals using n_elements as the limit
+	# and stores it in t6
+	# t1 - Pointer to x_vals
+	# t3 - Pointer to n_elements
+	# t6 - Summation of x_vals
+	
+	addi s0, x0, 0		# (s0) Counter
+	addi s1, x0, 0		# (s1) Summation of x_vals
+
+summation_x:
+	beq s0, t3, summation_x_end
+	lw t4, (t1)			# (t4) x_vals
+
+	addi s0, s0, 1		# Increment counter
+	add s1, s1, t4		# Add x_vals to summation
+	addi t1, t1, 4		# Increment pointer to x_vals
+	j summation_x
+
+
+summation_x_end:
+
+
 
 
 	bye
