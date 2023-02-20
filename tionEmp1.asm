@@ -22,6 +22,32 @@
 	new_line
 .end_macro
 
+.macro reset_counters
+	addi s0, x0, 0
+	addi s1, x0, 0
+.end_macro
+
+.macro reset_pointers
+	la t1, x_vals
+	la t2, y_vals
+.end_macro
+
+.macro summation(%t, %s)
+	lw s6, (%t)			# Loads pointer
+	addi s0, s0, 1		# increment counter
+	add %s, %s, s6		# adds summation
+	addi %t, %t, 4		# adds 4 to move pointer
+.end_macro
+
+.macro sum_square(%t, %s)
+	lw s6, (%t)			# s6 <-- x_vals
+	
+	addi s0, s0, 1 		# Increment counter
+	mul s6, s6, s6		# Square
+	add %s, %s, s6		# Add val to summation
+	addi %t, %t, 4		# adds 4 to move pointer
+.end_macro
+
 .data
 x_vals: .word 1, 2, 3, 4, 5
 y_vals: .word 10, 15, 30, 40, 50
@@ -48,25 +74,13 @@ main:
 	la t3, n_elements	# (t3) Pointer to n_elements
 
 	lw s11, (t3)		# n_elements limit
-
-	# Grabs the summation of x_vals using n_elements as the limit
-	# and stores it in t6
-	# t1 - Pointer to x_vals
-	# t3 - Pointer to n_elements
-	# t6 - Summation of x_vals
 	
-	addi s0, x0, 0		# (s0) Counter
-	addi s1, x0, 0		# (s1) Summation of x_vals
-
+	reset_counters		# sets s0, s1 to 0
+	
 summation_x:
 	beq s0, s11, summation_x_end
-	lw s6, (t1)			# s6 <-- x_vals
-
-	addi s0, s0, 1		# Increment counter
-	add s1, s1, s6		# Add x_vals to summation
-	addi t1, t1, 4		# Increment pointer to x_vals
+	summation(t1, s1)
 	j summation_x
-
 
 summation_x_end:
 	la t4, x_sum
@@ -74,21 +88,11 @@ summation_x_end:
 
 	print_int(print_x_sum, s1)		# Prints summation of x_vals
 
-	# Grabs the summation of y_vals using n_elements as the limit
-	# and stores it in t7
-	# t2 - Pointer to y_vals
-	# t3 - Pointer to n_elements
-	# t7 - Summation of y_vals
+	reset_counters		# sets s0, s1 to 0
 
-	addi s0, x0, 0		# (s0) Counter
-	addi s1, x0, 0		# (s1) Summation of y_vals
 summation_y:
 	beq, s0, s11, summation_y_end
-	lw s6, (t2)			# s6 <-- y_vals
-
-	addi s0, s0, 1 		# Increment counter
-	add s1, s1, s6		# Add y_vals to summation
-	addi t2, t2, 4		# Increment pointer to y_vals
+	summation(t2, s1)
 	j summation_y
 
 summation_y_end:
@@ -97,24 +101,14 @@ summation_y_end:
 
 	print_int(print_y_sum, s1)		# Prints summation of y_vals
 
-	# Reset counters
-	la t1, x_vals		# (t1) Pointer to x_vals
-	la t2, y_vals		# (t2) Pointer to y_vals
-
-
-	addi s0, x0, 0		# (s0) Counter
-	addi s1, x0, 0		# (s1) Summation of square of x_vals
-
 	# ------- Summation of Squares ------- #
+	
+	reset_pointers
+	reset_counters
 
 sum_x_square:
 	beq, s0, s11, sum_x_square_end
-	lw s6, (t1)			# s6 <-- x_vals
-	
-	addi s0, s0, 1 		# Increment counter
-	mul s6, s6, s6		# Square
-	add s1, s1, s6		# Add val to summation
-	addi t1, t1, 4		# Increment pointer to x_vals
+	sum_square(t1, s1)
 	j sum_x_square
 			
 sum_x_square_end:
@@ -129,12 +123,7 @@ sum_x_square_end:
 
 sum_y_square:
 	beq, s0, s11, sum_y_square_end
-	lw s6, (t2)			# s6 <-- y_vals
-	
-	addi s0, s0, 1 		# Increment counter
-	mul s6, s6, s6		# Square
-	add s1, s1, s6		# Add val to summation
-	addi t2, t2, 4		# Increment pointer to y_vals
+	sum_square(t2, s1)
 	j sum_y_square
 			
 sum_y_square_end:
@@ -143,6 +132,10 @@ sum_y_square_end:
 	sw s1, (t4)
 
 	print_int(print_y_sum2, s1)		# Prints summation of y_vals
+
+	reset_pointers
+	reset_counters
+
 
 
 	bye
