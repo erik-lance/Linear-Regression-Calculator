@@ -136,6 +136,25 @@ sum_y_square_end:
 	reset_pointers
 	reset_counters
 
+sum_xy_product:
+	beq, s0, s11, sum_xy_product_end
+	lw s6, (t1)		# x_val
+	lw s7, (t2)		# y_val
+	
+	addi s0, s0, 1		# incr counter
+	mul s6, s6, s7		# product xy
+	add s1, s1, s6		# add product
+	
+	addi t1, t1, 4		# move pointer
+	addi t2, t2, 4		# move pointer
+	
+	j sum_xy_product
+	
+sum_xy_product_end:
+
+	la t4, xy_sum_product
+	sw s1, (t4)
+	print_int(print_xy_sum, s1)
 
 
 	bye
