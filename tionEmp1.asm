@@ -22,6 +22,17 @@
 	new_line
 .end_macro
 
+.macro print_float(%w, %x)
+	li a7, 4
+	la a0, %w
+	ecall
+
+	li a7, 2
+	fmv.s fa0, %x
+	ecall
+	new_line
+.end_macro
+
 .macro reset_counters
 	addi s0, x0, 0
 	addi s1, x0, 0
@@ -156,5 +167,56 @@ sum_xy_product_end:
 	sw s1, (t4)
 	print_int(print_xy_sum, s1)
 
+	reset_pointers
+	reset_counters
+
+slope:
+	# m = n * sum_xy - sum_x * sum_y
+	la t1, x_sum
+	la t2, y_sum
+	la t3, xy_sum_product
+	
+	lw s3, (t1)
+	lw s4, (t2)
+	lw s5, (t3)
+	
+	mul s1, s5, s11		# num_elements * xy_sum_product
+	mul s2, s3, s4
+	sub s1, s1, s2
+	
+	# Denominator
+	la t2, x_sum_squared
+	lw s2, (t2)
+	
+	mul s2, s2, s11		# num_elements * x_sum_squared
+	mul s3, s3, s3		# Square x sum
+	sub s2 s2, s3
+	
+	fcvt.s.w f1, s1		# Convert numerator to float
+	fcvt.s.w f2, s2		# Convert denominator to float
+	
+	fdiv.s f0, f1, f2	# m
+	print_float(print_m,f0)
+
+intercept:
+	# sum_y - m * sum_x / n
+	la t1, y_sum
+	la t2, x_sum
+	
+	lw s2, (t1)
+	lw s3, (t2)
+	
+	fcvt.s.w f1, s2
+	fcvt.s.w f2, s3
+	fcvt.s.w f3, s11
+	
+	fmul.s f2, f2, f0	# m * sum_x
+	fsub.s f1, f1, f2	# sum_y - m * sum_x
+	
+	fdiv.s f1, f1, f3	# divide by num_elements
+	print_float(print_b, f1)
+	
 
 	bye
+
+
