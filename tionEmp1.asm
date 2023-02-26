@@ -11,10 +11,14 @@
 	ecall
 .end_macro
 
-.macro print_int(%w, %x)
+.macro print_str(%s)
 	li a7, 4
-	la a0, %w
+	la a0, %s
 	ecall
+.end_macro
+
+.macro print_int(%w, %x)
+	print_str(%w)
 
 	li a7, 1
 	mv a0, %x
@@ -23,9 +27,7 @@
 .end_macro
 
 .macro print_float(%w, %x)
-	li a7, 4
-	la a0, %w
-	ecall
+	print_str(%w)
 
 	li a7, 2
 	fmv.s fa0, %x
@@ -59,11 +61,20 @@
 	addi %t, %t, 4		# adds 4 to move pointer
 .end_macro
 
+.macro move_ptr(%t)
+	addi %t, %t, 4		# Moves pointer up
+.end_macro
+
+.macro check_incr_values
+
+.end_macro
+
 .data
 x_vals: .word 1, 2, 3, 4, 5
 y_vals: .word 10, 15, 30, 40, 50
 n_elements: .word 5
 
+print_program: .asciz "Linear regression solver"
 print_x_sum: .asciz "x_sum:"
 print_y_sum: .asciz "y_sum:"
 print_x_sum2: .asciz "x_sum_2:"
@@ -71,6 +82,9 @@ print_y_sum2: .asciz "y_sum_2:"
 print_xy_sum: .asciz "xy_sum:"
 print_m: .asciz "m:"
 print_b: .asciz "b:"
+
+error_inputs: .asciz "Error: 3 or more inputs required"
+error_linear: .asciz "Error: Input is not linear. Input values should be increasing"
 
 x_sum: .word 0
 y_sum: .word 0
@@ -87,6 +101,48 @@ main:
 	lw s11, (t3)		# n_elements limit
 	
 	reset_counters		# sets s0, s1 to 0
+	
+	print_str(print_program)
+	new_line
+	
+	# Error Checker
+	
+	addi s10, x0, 0	# X counter
+	addi s9, x0, 0 	# Y counter
+	
+check_x:
+	beq t1, t2, check_y
+	move_ptr(t1)
+	addi s10, s10, 1	# Add X counter
+	j check_x
+
+check_y:
+	beq t2, t3, eval_xy_check
+	move_ptr(t2)
+	addi s9, s9, 1	# Add Y counter
+	j check_y
+	
+eval_xy_check:
+	addi s8, x0, 3				# Less than 3
+	blt s10, s8, end_fail_size	# Fail if x < 3
+	blt s9, s8, end_fail_size	# Fail if y < 3
+
+	reset_pointers
+
+store_incr:
+	lw s5, (t2)		# cur_number
+	
+incr_check:
+	move_ptr(t2)		# Check y_val
+	beq t2, t3, begin	# Reached counter
+	lw s6, (t2)
+	ble s6, s5, end_fail_incr
+	j store_incr
+
+	# Begin program #
+begin:	
+	reset_pointers
+	reset_counters
 	
 summation_x:
 	beq s0, s11, summation_x_end
@@ -214,9 +270,15 @@ intercept:
 	fsub.s f1, f1, f2	# sum_y - m * sum_x
 	
 	fdiv.s f1, f1, f3	# divide by num_elements
-	print_float(print_b, f1)
-	
 
+end_success:
+	print_float(print_b, f1)
 	bye
 
+end_fail_size:
+	print_str(error_inputs)
+	bye
 
+end_fail_incr:
+	print_str(error_linear)
+	bye
