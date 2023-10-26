@@ -1,4 +1,4 @@
-.globl main # Erik Lance L. Tiongquico - S14
+.globl main
 
 .macro bye
 	li a7, 10
@@ -49,7 +49,7 @@
 	lw s6, (%t)			# Loads pointer
 	addi s0, s0, 1		# increment counter
 	add %s, %s, s6		# adds summation
-	addi %t, %t, 4		# adds 4 to move pointer
+	move_ptr(%t)
 .end_macro
 
 .macro sum_square(%t, %s)
@@ -58,7 +58,7 @@
 	addi s0, s0, 1 		# Increment counter
 	mul s6, s6, s6		# Square
 	add %s, %s, s6		# Add val to summation
-	addi %t, %t, 4		# adds 4 to move pointer
+	move_ptr(%t)
 .end_macro
 
 .macro move_ptr(%t)
@@ -94,7 +94,7 @@ xy_sum_product: .word 0
 
 .text
 main:
-	la t1, x_vals		# (t1) Pointer to x_vals
+	la t1, x_vals		# Erik Lance L. Tiongquico - S14
 	la t2, y_vals		# (t2) Pointer to y_vals
 	la t3, n_elements	# (t3) Pointer to n_elements
 
